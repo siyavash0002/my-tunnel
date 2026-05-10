@@ -1,0 +1,8 @@
+{
+  "name": "my-tunnel",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "net": "^1.0.2"
+  }
+}
