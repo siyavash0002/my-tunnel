@@ -1,22 +1,25 @@
+const http2 = require('http2');
 const net = require('net');
 
-module.exports = (req, res) => {
-    const dest = process.env.DEST;
+export default function (req, res) {
+    const dest = process.env.DEST; // 178.105.3.15:10085
     const path = process.env.V_PATH || '/vercel-xhttp';
 
-    if (req.url.split('?')[0] !== path) {
-        res.statusCode = 404;
+    if (!req.url.startsWith(path)) {
+        res.writeHead(404);
         res.end();
         return;
     }
 
     const [destIp, destPort] = dest.split(':');
-    const client = net.connect(destPort, destIp, () => {
-        req.pipe(client).pipe(res);
+    const target = net.connect(destPort, destIp, () => {
+        req.pipe(target).pipe(res);
     });
 
-    client.on('error', () => {
-        res.statusCode = 502;
+    target.on('error', (err) => {
+        res.writeHead(502);
         res.end();
     });
-};
+
+    req.on('close', () => target.destroy());
+}
